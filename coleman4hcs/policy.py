@@ -527,7 +527,7 @@ class Exp4Policy(Policy):
         :param agent: The agent for which credit assignment is being performed.        
         :type agent: Agent
         """
-        super().credit_assignment(agent)
+        pass
 
     def update_weights(self, agent, rewards):
         """
