@@ -499,3 +499,52 @@ class SWLinUCBPolicy(LinUCBPolicy):
         arms = pd.DataFrame(records, columns=['Name', 'Q'])
         arms.sort_values(by='Q', ascending=False, inplace=True)
         return arms['Name'].tolist()
+
+class Exp4Policy(Policy):
+    """
+    Policy implementation using the EXP4 algorithm for credit assignment.
+    """
+    def __init__(self, c=0.5):        
+        super().__init__()
+        self.c = c
+        self.weights = None
+    
+    def __str__(self):
+        return f'Exp4 (C={self.c})'
+    
+    def choose_all(self, agent: Agent):
+        """        
+        Chooses all actions available in the agent.
+        :param agent: The agent making the decision.
+        :type agent: Agent        
+        :return: The list of chosen actions.
+        """        # Retorna todas as ações disponíveis
+        return agent.actions['Name'].tolist()
+    
+    def credit_assignment(self, agent):        
+        """
+        Does nothing here, as rewards are observed after actions are chosen.        
+        :param agent: The agent for which credit assignment is being performed.        
+        :type agent: Agent
+        """
+        super().credit_assignment(agent)
+
+    def update_weights(self, agent, rewards):
+        """
+        Update EXP4 weights based on received rewards.
+        :param agent: The agent for which weights are being updated.
+        :type agent: Agent        
+        :param rewards: Dictionary containing rewards for each action.
+        :type rewards: dict        
+        """
+        total_reward = sum(rewards.values())        
+        # Obter os nomes das ações disponíveis no agente
+        actions_list = agent.actions['Name'].values  # Convertendo para array numpy        
+        for action, reward in rewards.items():            # Encontrar o índice da ação
+            action_indices = np.where(actions_list == action)[0]            
+            if len(action_indices) > 0:
+                action_index = action_indices[0]                # Atualizar os pesos de acordo com o algoritmo EXP4
+                self.weights[action_index] *= np.exp((self.c * reward) / (len(actions_list) * total_reward))            
+            else:
+                pass
+       
